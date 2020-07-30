@@ -3,4 +3,4 @@
 ### [https://torres.ai/deep-reinforcement-learning-explained-series](https://torres.ai/deep-reinforcement-learning-explained-series) 
 
 
-<a href="https://torres.ai/deep-reinforcement-learning-explained-series"><img src="https://github.com/jorditorresBCN/Deep-Reinforcement-Learning-Explained/blob/master/DeepLearningExplained-logo.png" alt="Deep Reinforcement Learning Explained"</a>
+<a href="https://torres.ai/deep-reinforcement-learning-explained-series"><img src="https://github.com/jorditorresBCN/Deep-Reinforcement-Learning-Explained/blob/master/DeepLearningExplained-logo.png" alt="Deep Reinforcement Learning Explained"></a>
