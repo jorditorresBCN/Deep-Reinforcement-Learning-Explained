@@ -1,0 +1,231 @@
+\documentclass[10pt]{amsart}
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+\geometry{letterpaper}                  
+\geometry{landscape}      
+\usepackage{hyperref}
+
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{tabto}
+\usepackage{url}
+\usepackage{empheq, comment}
+\usepackage[ruled]{algorithm2e}
+\usepackage{fancyhdr}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{}
+\fancyhead[R]{
+\includegraphics[width=4cm]{upc-bsc-logo.png}
+}
+%\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+\pagestyle{fancy}
+
+\title{Deep Reinforcement Learning Explained}
+
+
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+
+
+\section*{A Markov Decision Process (MDP) is difined by: <S,A,R,$\gamma$,p>}
+
+\begin{itemize}
+
+\item[] $\mathcal{S}^+$ \tabto{2cm} set of all states (including terminal states)
+\item[] $\mathcal{A}$ \tabto{2cm} set of all actions 
+
+\item[] $\mathcal{R}$ \tabto{2cm} set of all rewards
+
+\item[] $\gamma$ \tabto{2cm} discount rate (where $0 \leq \gamma \leq 1$)
+\item[] $p(s',r|s,a)$ \tabto{2cm} the one-step dynamics of the environment (transition function),
+\item[] \tabto{2cm} probability of next state $s'$ and reward $r$, given current state $s$ and current action $a$
+\item[]  \tabto{2cm}  $\doteq Pr(S_{t}=s', R_{t}=r|S_{t-1} = s, A_{t-1} = a)$
+\end{itemize}
+
+\vspace{.5in}
+
+\section*{Other related definitions}
+\begin{itemize}
+\item[] $S_t$ \tabto{2cm} state at time $t$
+\item[] $A_t$ \tabto{2cm} action at time $t$
+\item[] $R_t$ \tabto{2cm} reward at time $t$
+
+\item[] $G_t$ \tabto{2cm} discounted return at time $t$ 
+\item[] \tabto{2cm}  =  $R_{t+1}$ + $\gamma R_{t+2}$ + $\gamma^2 R_{t+3}$ + $\gamma^3 R_{t+4}$ + ...= $\sum_{k=0}^\infty \gamma^k R_{t+k+1}$
+\item[] $\mathcal{S}$ \tabto{2cm} set of all non-terminal states
+\item[] $\mathcal{A}(s)$ \tabto{2cm} set of all actions available in state $s$
+\item[] Trajectory: \tabto{2cm} ($S_0$,$A_0$, $S_1$,$A_1$,$R_1$, ... , $S_{t-1}$,$A_{t-1}$,$R_{t-1}$,$S_t$,$A_t$,$R_t$)
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+\section*{Policies and Value Function}
+\begin{itemize}
+\item[] $\pi(s)$ \tabto{2cm} deterministic policy 
+\item[] \tabto{2.5cm} $\pi(s) \in \mathcal{A}(s)$ for all $s \in \mathcal{S}$ 
+\item[] $\pi(a|s)$ \tabto{2cm} stochastic policy 
+\item[] \tabto{2.5cm}  $\pi(a|s) = \mathbb{P}(A_t=a|S_t=s)$ for all $s \in \mathcal{S}$ and $a \in \mathcal{A}(s)$
+\item[] $v_\pi$ \tabto{2cm} state-value function for policy $\pi$ 
+\item[] \tabto{2.5cm}  $v_\pi(s) \doteq \mathbb{E}[G_t|S_t=s]$ for all $s\in\mathcal{S}$
+\item[] $q_\pi$ \tabto{2cm} action-value function for policy $\pi$
+\item[] \tabto{2.5cm}  $q_\pi(s,a) \doteq \mathbb{E}[G_t|S_t=s, A_t=a]$ for all $s \in \mathcal{S}$ and $a \in \mathcal{A}(s)$
+\item[] $v_*$ \tabto{2cm} optimal state-value function 
+\item[] \tabto{2.5cm}  $v_*(s) \doteq \max_\pi v_\pi(s)$ for all $s \in \mathcal{S}$
+
+\item[] $q_*$ \tabto{2cm} optimal action-value function 
+\item[] \tabto{2.5cm}  $q_*(s,a) \doteq \max_\pi q_\pi(s,a)$ for all $s \in \mathcal{S}$ and $a \in \mathcal{A}(s)$
+
+\item[] $\pi_*(s)$ \tabto{2cm} Optimal policy 
+\item[] \tabto{2.5cm}  $\pi_*(s) \doteq \arg\max_{a\in\mathcal{A}(s)} q_*(s,a)$ 
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{.5in}
+
+\section*{Bellman Equations}
+
+
+\begin{empheq}{align}
+v_\pi(s) = \sum_{a \in \mathcal{A}(s)}\pi(a|s)\sum_{s' \in \mathcal{S}, r\in\mathcal{R}}p(s',r|s,a)(r + \gamma v_\pi(s'))\nonumber
+\end{empheq}
+\\ 
+\begin{empheq}{align}
+q_\pi(s,a) = \sum_{s' \in \mathcal{S}, r\in\mathcal{R}}p(s',r|s,a)(r + \gamma\sum_{a' \in \mathcal{A}(s')} \pi(a'|s') q_\pi(s',a'))\nonumber
+\end{empheq}
+\\ 
+\begin{empheq}{align}
+v_*(s) = \max_{a \in \mathcal{A}(s)}\sum_{s' \in \mathcal{S}, r\in\mathcal{R}}p(s',r|s,a)(r + \gamma v_*(s')) \nonumber
+\end{empheq}
+\\ 
+\begin{empheq}{align}
+q_*(s,a) = \sum_{s' \in \mathcal{S}, r\in\mathcal{R}}p(s',r|s,a)(r + \gamma \max_{a'\in\mathcal{A}(s')}q_*(s',a')) \nonumber
+\end{empheq}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+\section*{First-Visit MC Prediction Algorithm}
+
+
+\begin{algorithm}
+	\KwIn{policy $\pi$, $num\_episodes$}
+%    	\KwOut{value function $Q$ ($\approx q_\pi$ if $num\_episodes$ is large enough)}
+	Initialize $N(s,a) = 0$ for all $s\in\mathcal{S}, a\in\mathcal{A}(s)$ \\
+	Initialize $returns\_sum(s,a) = 0$ for all $s\in\mathcal{S}, a\in\mathcal{A}(s)$ \\
+    	\For{$i \leftarrow 1 \textbf{ to } num\_episodes$}{
+    		Generate an episode $S_0, A_0, R_1, \ldots, S_T$ using $\pi$\\
+		\For{$t \leftarrow 0 \textbf{ to }T-1$}{
+			\uIf{$(S_t,A_t)$ is a first visit (with return $G_t$)}{
+				$N(S_t, A_t) \leftarrow N(S_t, A_t) + 1$\\
+				$returns\_sum(S_t, A_t) \leftarrow returns\_sum(S_t, A_t) + G_t$
+			}
+		}
+	}
+	$Q(s,a) \leftarrow returns\_sum(s,a)/N(s,a)$ for all $s\in\mathcal{S}$, $a\in\mathcal{A}(s)$\\
+	\KwRet{$Q$}
+	\caption{First-Visit MC Prediction}
+\end{algorithm}
+
+\vspace{.5in}
+
+ 
+ $\pi_{0} \xrightarrow{E} q_{\pi_{0}}  \xrightarrow{I} \pi_{1} \xrightarrow{E} q_{\pi_{1}}  \xrightarrow{I} \pi_{2} \xrightarrow{E} . . . \xrightarrow{I}  \pi_{*} \xrightarrow{E} q_{\pi_{*}} $
+
+\vspace{.5in}
+
+
+$S_0, A_0, R_1, \ldots, S_T$
+
+\vspace{.5in}
+
+$Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha(G_t - Q(S_t, A_t))$
+
+\vspace{.5in}
+
+1-$\epsilon + \epsilon/|A(S)|$
+
+\vspace{.5in}
+
+$\epsilon/|A(S)|$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+
+\section*{Constant-$\alpha$ MC Control with $\epsilon$ decay}
+
+
+
+\begin{algorithm}
+	\KwIn{$num\_episodes$, $\alpha$, $\epsilon$-decay, $\gamma$}
+
+	Initialize $Q(s,a) = 0$ for all $s\in\mathcal{S}$ and $a\in\mathcal{A}(s)$ \\
+	\For{$i \leftarrow 1 \textbf{ to } num\_episodes$}{
+	$\epsilon \leftarrow $ setting new epsilon with $\epsilon$-decay\\
+	$\pi \leftarrow \epsilon\text{-greedy}(Q)$\\
+    	Generate an episode $S_0, A_0, R_1, \ldots, S_T$ using $\pi$\\
+	\For{$t \leftarrow 0 \textbf{ to }T-1$}{
+	        $G_t  \leftarrow $ compute discounted return using $\gamma$ \\
+			$Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha(G_t - Q(S_t, A_t))$
+		}
+	}
+	\KwRet{$\pi$}
+	\caption{Constant-$\alpha$ MC Control with $\epsilon$ decay}
+\end{algorithm}
+
+
+
+
+\vspace{.5in}
+
+
+\section*{ MC \and TD Update equations summary}
+\vspace{.2in}
+
+
+\begin{itemize}
+
+\item[] Monte Carlo \tabto{3cm} $Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha($ \mbox{\boldmath$ G_t$} - Q(S_t, A_t))$
+\vspace{.2in}
+
+\item[] Sarsa \tabto{3cm} $Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha($ \mbox{\boldmath$ R_{t+1}+\gamma Q(S_{t+1}, A_{t+1})$} $ - Q(S_t, A_t))$ 
+
+
+\vspace{.2in}
+
+\item[] Sarsamax \tabto{3cm} $Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha($ \mbox{\boldmath$ R_{t+1}+\gamma \max_{a \in \mathcal{A}(s)}Q(S_{t+1}, a)$} $ - Q(S_t, A_t))$
+
+\vspace{.2in}
+
+\item[] Expected Sarsa \tabto{3cm} $Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha($ \mbox{\boldmath$ R_{t+1}+\gamma \sum_{a \in \mathcal{A}(s)}\pi(a|S_{t+1}) Q(S_{t+1}, a)$} $ - Q(S_t, A_t))$
+\end{itemize}
+
+\newpage
+
+
+\section*{ Stub for the post}
+
+\vspace{.2in}
+
+$S_0, A_0, R_1, S_1, A_1$
+
+\vspace{.2in}
+
+\begin{itemize}
+
+\item[] Sarsa (t=0) \tabto{3cm} $Q(S_0, A_0) \leftarrow Q(S_0, A_0) + \alpha($ \mbox{\boldmath$ R_{1}+\gamma Q(S_{1}, A_{1})$} $ - Q(S_0, A_0))$ 
+
+
+\end{itemize}
+
+\vspace{1in}
+
+
+(*) For further references go to the next url: \url{https://torres.ai/deep-reinforcement-learning-explained-series} 
+
+
+\end{document}  
