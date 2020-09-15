@@ -5,5 +5,5 @@
 
 
 ### Updated index of the posts published in this series 
-### [https://torres.ai/deep-reinforcement-learning-explained-series](Updated index of the posts published in this series) 
+### [Updated index of the posts published in this series](https://torres.ai/deep-reinforcement-learning-explained-series) 
 
